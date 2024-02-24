@@ -1,4 +1,5 @@
-package com.sismanut.sismanut.config.exceptionsControl;
+package app.app.config.exceptionsControl;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;

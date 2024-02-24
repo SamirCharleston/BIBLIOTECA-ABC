@@ -1,4 +1,4 @@
-package com.sismanut.sismanut.config.messageHandling.errorMessages;
+package app.app.config.messageHandling.errorMessages;
 
 public abstract class ExceptionMessages {
     private static final String ALREADY_EXISTS = " already exists.";

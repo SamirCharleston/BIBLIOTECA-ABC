@@ -1,4 +1,4 @@
-package com.sismanut.sismanut.config.customExceptions;
+package app.app.config.customExceptions;
 
 public class AlreadyFinishedException extends RuntimeException {
     public AlreadyFinishedException(String message){

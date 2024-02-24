@@ -1,4 +1,4 @@
-package com.sismanut.sismanut.config.validations;
+package app.app.config.validations;
 
 public class RegexValidation {
     public static final String NAME = "^[a-zA-Z\\s]{1,50}$";

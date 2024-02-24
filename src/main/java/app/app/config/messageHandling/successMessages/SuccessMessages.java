@@ -1,4 +1,4 @@
-package com.sismanut.sismanut.config.messageHandling.successMessages;
+package app.app.config.messageHandling.successMessages;
 
 public abstract class SuccessMessages {
     private static final String SUCCESSFULLY = "successfully";

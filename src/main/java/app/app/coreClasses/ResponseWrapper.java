@@ -1,11 +1,12 @@
-package com.sismanut.sismanut.coreClasses;
+package app.app.coreClasses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseWrapper<T> {

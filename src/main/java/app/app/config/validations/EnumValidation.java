@@ -1,4 +1,5 @@
-package com.sismanut.sismanut.config.validations;
+package app.app.config.validations;
+
 import java.util.Set;
 
 public class EnumValidation<T extends Enum<T>>{

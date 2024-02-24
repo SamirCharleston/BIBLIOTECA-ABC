@@ -10,7 +10,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BibliotecaEntity extends CrudGenericEntity {
+public class AutorEntity extends CrudGenericEntity {
     private String nome;
-    private String telefone;
+    private String cpf;
+    private Integer idade;
 }

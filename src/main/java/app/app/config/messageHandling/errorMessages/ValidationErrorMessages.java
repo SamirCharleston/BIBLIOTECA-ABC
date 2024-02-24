@@ -1,4 +1,4 @@
-package com.sismanut.sismanut.config.messageHandling.errorMessages;
+package app.app.config.messageHandling.errorMessages;
 
 public abstract class ValidationErrorMessages {
     public static final String SPACE_AND_LETTERS = "This field must contain only spaces and alphabetic characters.";
