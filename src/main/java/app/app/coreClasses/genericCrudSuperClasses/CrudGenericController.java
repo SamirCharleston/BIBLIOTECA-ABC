@@ -1,26 +1,30 @@
 package app.app.coreClasses.genericCrudSuperClasses;
-
 import app.app.coreClasses.ResponseWrapper;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 public abstract class CrudGenericController <
         Entity extends CrudGenericEntity,
-        Service extends CrudGenericService<Entity>
+        Service extends CrudGenericService<Entity, Repository, DTOIn, DTOOut>,
+        Repository extends CrudGenericRepository<Entity>,
+        DTOIn extends CrudGenericDTOIn,
+        DTOOut
         >{
     @Autowired
     Service service;
     @PostMapping(CrudGenericEndPointName.SAVE)
     private ResponseEntity<ResponseWrapper<String>>
-    register(@RequestBody Entity object){
+    register(@RequestBody @Valid DTOIn object){
 
         ResponseWrapper<String> response = new ResponseWrapper<>();
 
         try {
-            response.setMessage(service.save(object));
+            response.setMessage(service.register(object));
             return ResponseEntity.ok(response);
         } catch (Exception e){
             response.setError(e.getMessage());
@@ -28,13 +32,14 @@ public abstract class CrudGenericController <
         }
     }
     @GetMapping(CrudGenericEndPointName.FIND_ALL)
-    private ResponseEntity<ResponseWrapper<List<Entity>>>
-    listAll(){
+    private ResponseEntity<ResponseWrapper<List<DTOOut>>>
+    find(@RequestParam("quantity") Long quantity,
+           @RequestParam("order") String order) {
 
-        ResponseWrapper<List<Entity>> response = new ResponseWrapper<>();
+        ResponseWrapper<List<DTOOut>> response = new ResponseWrapper<>();
 
         try {
-            response.setObject(service.listAll());
+            response.setObject(service.find(quantity, order));
             return ResponseEntity.ok(response);
         } catch (Exception e){
             response.setError(e.getMessage());
@@ -42,13 +47,13 @@ public abstract class CrudGenericController <
         }
     }
     @GetMapping(CrudGenericEndPointName.FIND_BY_ID)
-    private ResponseEntity<ResponseWrapper<Entity>>
-    findById(@RequestBody Entity entity) {
+    private ResponseEntity<ResponseWrapper<DTOOut>>
+    findById(@RequestParam("id")UUID id) {
 
-        ResponseWrapper<Entity> response = new ResponseWrapper<>();
+        ResponseWrapper<DTOOut> response = new ResponseWrapper<>();
 
         try {
-            response.setObject(service.findById(entity.getId()));
+            response.setObject(service.findById(id));
             return ResponseEntity.ok(response);
         } catch (Exception e){
             response.setError(e.getMessage());
@@ -57,7 +62,7 @@ public abstract class CrudGenericController <
     }
     @PutMapping(CrudGenericEndPointName.UPDATE)
     private ResponseEntity<ResponseWrapper<String>>
-    update(@RequestBody Entity object) {
+    update(@RequestBody @Valid DTOIn object) {
 
         ResponseWrapper<String> response = new ResponseWrapper<>();
 
@@ -71,12 +76,12 @@ public abstract class CrudGenericController <
     }
     @DeleteMapping(CrudGenericEndPointName.DELETE)
     private ResponseEntity<ResponseWrapper<String>>
-    delete(@RequestBody Entity object) {
+    delete(@RequestParam("id") UUID id) {
 
         ResponseWrapper<String> response = new ResponseWrapper<>();
 
         try {
-            response.setMessage(service.delete(object.getId()));
+            response.setMessage(service.delete(id));
             return ResponseEntity.ok(response);
         } catch (Exception e){
             response.setError(e.getMessage());

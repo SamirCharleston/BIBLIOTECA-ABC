@@ -1,4 +1,4 @@
-package app.app.config.webConfig;
+package com.app.livrariaabc.config.webConfig;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

@@ -1,5 +1,4 @@
-package app.app.config.validations;
-
+package com.app.livrariaabc.config.validations;
 import java.util.Set;
 
 public class EnumValidation<T extends Enum<T>>{

@@ -1,92 +1,132 @@
 package app.app.coreClasses.genericCrudSuperClasses;
 
-import app.app.config.customExceptions.EntityAlrealdyRegisteredException;
-import app.app.config.customExceptions.EntityNotFoundException;
-import app.app.config.customExceptions.EntityNullException;
-import app.app.config.customExceptions.IDNotValidException;
 import app.app.config.messageHandling.errorMessages.ExceptionMessages;
 import app.app.config.messageHandling.successMessages.SuccessMessages;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public abstract class CrudGenericService<Entity extends CrudGenericEntity>{
+@Transactional
+public abstract class CrudGenericService<
+        Entity extends CrudGenericEntity,
+        Repository extends CrudGenericRepository<Entity>,
+        DTOIn extends CrudGenericDTOIn,
+        DTOOut
+        > implements CrudStandardServiceMethods<
+        Entity,
+        DTOIn,
+        DTOOut>{
+    @Autowired
+    private Repository repository;
+    @Autowired
+    private ModelMapper modelMapper;
+    public String genericRegister(
+            DTOIn objectIn,
+            Class<Entity> entityClass
+    ) throws Exception {
 
-    private List<Entity> entities = new ArrayList<>();
-    public String save(Entity entity)
-            throws EntityAlrealdyRegisteredException,
-            EntityNullException{
+        /*
+        * Get the ID if this entity already exists but has been deactivated
+        * */
+        UUID uuid = this.findByAttribute(objectIn);
+        Entity entityToPersist = modelMapper.map(objectIn, entityClass);
 
-        if(entity == null)
-            throw new EntityNullException("Entity cannot be null");
+        if(uuid != null){
+            entityToPersist.setId(uuid);
+            entityToPersist.setStatus(true);
+        }
 
-        if(entity.getId() == null)
-            throw new IDNotValidException("The Id must have a value");
+        entityToPersist = this.handleRelatedEntities(entityToPersist);
+        entityToPersist = this.applyBusinessRules(entityToPersist);
 
-        this.entities.forEach(e ->{
-            if(e.getId().equals(entity.getId()))
-                throw new EntityAlrealdyRegisteredException(ExceptionMessages.ENTITY_ALREADY_EXISTS);
-        });
-
-        this.entities.add(entity);
+        repository.save(entityToPersist);
 
         return SuccessMessages.CREATED;
     }
-    public Entity findById(Long id)
+    public DTOOut genericFindById(UUID id,
+                                    Class<DTOOut> dtoOutClass)
+            throws Exception {
+
+        if(!this.repository.existsById(id))
+            throw new EntityNotFoundException(ExceptionMessages.ENTITY_NOT_FOUND);
+
+        Entity entity = this.repository.getReferenceById(id);
+
+        if(!entity.isStatus())
+            throw new EntityNotFoundException(ExceptionMessages.ENTITY_NOT_FOUND);
+
+        return modelMapper.map(entity, dtoOutClass);
+    }
+    public List<DTOOut> genericFind(Long quantity,
+                                    String order,
+                                    Class<DTOOut> dtoOutClass)
             throws EntityNotFoundException {
 
-        if(id == null)
-            throw new IDNotValidException("Id cannot be null");
+        List<Entity> entities;
 
-        for(Entity e : this.entities){
-            if(e.getId().equals(id))
-                return e;
-        }
+        if(order != null && order.equals("DESC"))
+            entities = this.repository.findAll(Sort.by(Sort.Direction.DESC));
+        else
+            entities = this.repository.findAll();
 
-        throw new EntityNotFoundException(ExceptionMessages.ENTITY_NOT_FOUND);
-    }
-    public List<Entity> listAll()
-            throws EntityNotFoundException {
+        if(entities.isEmpty())
+            throw new EntityNotFoundException(ExceptionMessages.LIST_NOT_FOUND);
 
-        if(this.entities.isEmpty())
-            throw new EntityNotFoundException("There arent any saved entities.");
-
-        return this.entities;
-    }
-    public String update(Entity entity)
-            throws EntityNotFoundException,
-            EntityNullException,
-            IDNotValidException{
-
-        if(entity == null)
-            throw new EntityNullException("Entity cannot be null");
-
-        if(entity.getId() == null)
-            throw new IDNotValidException("The Id must have a value");
-
-        for(Entity e : this.entities){
-            if(e.getId().equals(entity.getId())){
-                this.entities.remove(e);
-                this.entities.add(entity);
-                return SuccessMessages.UPDATED;
+        List<Entity> entityList = new ArrayList<>();
+        for(int i = 0; i < quantity && i < entities.size(); i++){
+            if(entities.get(i).isStatus()){
+                entityList.add(entities.get(i));
             }
         }
 
-        throw new EntityNotFoundException(ExceptionMessages.ENTITY_NOT_FOUND);
+        if(entityList.isEmpty())
+            throw new EntityNotFoundException(ExceptionMessages.LIST_NOT_FOUND);
+
+        List<DTOOut> dtoOuts = new ArrayList<>();
+        entityList.forEach(e -> {
+            dtoOuts.add(modelMapper.map(e, dtoOutClass));
+        });
+
+        return dtoOuts;
     }
-    public String delete(Long id)
+    public String genericUpdate(DTOIn objectIn,
+                                Class<Entity> entityClass)
             throws EntityNotFoundException {
 
-        if(id == null)
-            throw new IDNotValidException("The Id must have a value");
+        if(!repository.existsById(objectIn.getId()))
+            throw new EntityNotFoundException(ExceptionMessages.ENTITY_NOT_FOUND);
 
-        for(Entity e : this.entities){
-            if(e.getId().equals(id)){
-                this.entities.remove(e);
-                return SuccessMessages.DELETED;
-            }
-        }
+        Entity entity = repository.getReferenceById(objectIn.getId());
 
-        throw new EntityNotFoundException(ExceptionMessages.ENTITY_NOT_FOUND);
+        if(!entity.isStatus())
+            throw new EntityNotFoundException(ExceptionMessages.ENTITY_NOT_FOUND);
+
+        Entity entityToSave = modelMapper.map(objectIn, entityClass);
+        entityToSave.setStatus(entity.isStatus());
+        repository.save(entityToSave);
+
+        return SuccessMessages.UPDATED;
+    }
+    public String genericDelete(UUID uuid)
+            throws EntityNotFoundException {
+
+        if(!repository.existsById(uuid))
+            throw new EntityNotFoundException(ExceptionMessages.ENTITY_NOT_FOUND);
+
+        Entity entity = repository.getReferenceById(uuid);
+
+        if(!entity.isStatus())
+            throw new EntityNotFoundException(ExceptionMessages.ENTITY_NOT_FOUND);
+
+        entity.setStatus(false);
+        repository.save(entity);
+
+        return SuccessMessages.DELETED;
     }
 }

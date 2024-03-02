@@ -1,12 +1,12 @@
-package app.app.config.validations;
+package com.app.livrariaabc.config.validations;
 
 public class RegexValidation {
     public static final String NAME = "^[a-zA-Z\\s]{1,50}$";
-    public static final String ONLY_LETTERS = "^[a-zA-Z]*$";
-    public static final String LETTERS_SPACES_NUMBERS = "^[a-zA-Z\\s0-9]*$";
-    public static final String LETTERS_SPACES_NUMBERS_DOTS = "^[a-zA-Z\\s0-9\\.]*$";
-    public static final String LETTERS_NUMBERS_HYPHEN = "^[a-zA-Z\\s0-9\\-]*$";
-    public static final String SPACE_AND_LETTERS = "^[a-zA-Z\\s]*$";
+    public static final String ONLY_LETTERS = "^[a-zA-ZÀ-ú]*$";
+    public static final String LETTERS_SPACES_NUMBERS = "^[a-zA-ZÀ-ú\\s0-9]*$";
+    public static final String LETTERS_SPACES_NUMBERS_DOTS = "^[a-zA-ZÀ-ú\\s0-9\\.\\,]*$";
+    public static final String LETTERS_NUMBERS_HYPHEN = "^[a-zA-ZÀ-ú\\s0-9\\-]*$";
+    public static final String SPACE_AND_LETTERS = "^[a-zA-ZÀ-ú\\s]*$";
     public static final String ONLY_NUMBERS = "^[0-9]*$";
     public static final String CELLPHONE_BR = "^\\([0-9]{2}\\)[0-9]{9}";
     public static final String LOGIN = "^[a-zA-Z0-9._-]{3,20}$";

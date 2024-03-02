@@ -20,6 +20,9 @@ public abstract class ValidationErrorMessages {
     public static final String MAX_120 = "This field must contain a maximum of 120 characters.";
     public static final String MAX_150 = "This field must contain a maximum of 150 characters.";
     public static final String MAX_250 = "This field must contain a maximum of 250 characters.";
+    public static final String MAX_350 = "This field must contain a maximum of 350 characters.";
+    public static final String MAX_500 = "This field must contain a maximum of 500 characters.";
+    public static final String MAX_750 = "This field must contain a maximum of 500 characters.";
     public static final String NOT_BLANK = "This field can't be blank.";
     public static final String NOT_NULL = "This field can't be null.";
     public static final String NOT_EMPTY = "This field needs at least one element.";
